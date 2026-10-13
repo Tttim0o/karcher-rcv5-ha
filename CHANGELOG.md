@@ -51,6 +51,9 @@ a CI gate (ADR-0004).
   display, matching the app's Privacy & Security / Carpet Settings screens.
 
 ### Changed
+- Lovelace card follows Home Assistant's own look: theme colour instead of the fixed yellow,
+  HA fonts, controls, tabs and chips; the Rooms / Zone control sits above the map instead of
+  covering it.
 - Minimum Home Assistant version is now 2026.9.0.
 - Devices now show their actual model instead of always reporting "RCV5", and every model
   gets the full entity set with a published support level saying how much evidence backs it.
@@ -72,6 +75,13 @@ a CI gate (ADR-0004).
   longer blames an unrecognized robot model — those now set up normally.
 
 ### Fixed
+- Lovelace card: the map, battery, stats and settings now load on current installs. The card
+  looked for companion entities under names derived from the vacuum entity (`…_vacuum_map`,
+  `…_vacuum_battery`), which do not exist; it now finds them on the vacuum's own device.
+- Lovelace card: the map no longer gets stuck on "loading", and the robot icon no longer goes
+  missing, after Home Assistant re-attaches the card (dashboard load, view switch).
+- A leftover second registration of the card resource is removed automatically, so browsers
+  cannot keep loading an old card build from it.
 - A DNS or network failure while opening the MQTT connection at setup no longer leaves the
   integration permanently failed; Home Assistant now retries it.
 - The "vacuum segments have changed" repair no longer appears while the robot is

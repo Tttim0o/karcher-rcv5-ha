@@ -6,7 +6,7 @@ import {
   willUpdateCard, deriveView, edgeFades, mapPlaceholderView, batteryView, statTiles,
   selectorRows, tabHelperText, roomListRows, targetLabel, viewState,
   resolveFaultEntity, resolveStationAttachedEntity, resolveEmptyStationEntity,
-  reconcileCustomiseView,
+  reconcileCustomiseView, companionEntity,
 } from "./card-view.js";
 import {
   zonePx, zoneMinPx, zoneHandleRadiusPx, zoneBounds, pinchGeometry, armPanDrag,
@@ -143,14 +143,24 @@ class KarcherVacuumCard extends LitElement {
     if (this._onVisibilityChange) {
       document.removeEventListener("visibilitychange", this._onVisibilityChange);
     }
+    // Abandoning an in-flight load must also clear the state that records it,
+    // or the card is stuck after HA re-attaches it (which it does routinely on
+    // dashboard load and view switches): the map kept _mapPending=true with its
+    // token already recorded, so updateMap() never re-fetched and the map stayed
+    // on "loading" forever; the robot icon kept _robotIconLoading=true, so
+    // loadRobotIcon() returned early and the robot was never drawn.
     if (this._mapImgLoad) {
       this._mapImgLoad.onload = null;
       this._mapImgLoad.onerror = null;
       this._mapImgLoad = null;
+      this._mapToken = null;
+      this._mapPending = false;
     }
     if (this._robotIconLoad) {
       this._robotIconLoad.onload = null;
+      this._robotIconLoad.onerror = null;
       this._robotIconLoad = null;
+      this._robotIconLoading = false;
     }
     this._stopReveal();
     if (this._nudgeRaf) {
@@ -269,7 +279,7 @@ class KarcherVacuumCard extends LitElement {
   // Robot unreachable: entity unavailable, or the connectivity sensor is off.
   _isOffline() {
     const activity = this._vacState()?.state;
-    const conn = this._config?.connectivity_entity;
+    const conn = this._config && companionEntity(this, "connectivity_entity");
     return activity === "unavailable" || !!(conn && this.hass.states[conn]?.state === "off");
   }
 
@@ -649,13 +659,13 @@ class KarcherVacuumCard extends LitElement {
     const { control, value } = e.detail || {};
     if (control === "mode") {
       this.hass.callService("select", "select_option",
-        { entity_id: this._config.cleaning_mode_entity, option: value });
+        { entity_id: companionEntity(this, "cleaning_mode_entity"), option: value });
     } else if (control === "suction") {
       this.hass.callService("vacuum", "set_fan_speed",
         { entity_id: this._config.vacuum_entity, fan_speed: value });
     } else if (control === "water") {
       this.hass.callService("select", "select_option",
-        { entity_id: this._config.water_level_entity, option: value });
+        { entity_id: companionEntity(this, "water_level_entity"), option: value });
     }
   }
 

@@ -185,13 +185,13 @@ In the dashboard editor, click **Add card**, search for **Kärcher Vacuum Card**
 
 The visual editor also sets the card height and an opt-in debug footer showing the loaded card version, HA version, state and map size — useful for confirming which card build a browser actually loaded, past the resource cache.
 
-If one of your entities was renamed away from the standard `<domain>.<stem>_<suffix>` pattern, open **Advanced — entity overrides** in the editor and point that one entity at the right entity_id.
+The card finds every companion entity (map, battery, selects, sensors) on the vacuum's own device, so renamed entities are picked up automatically. To point one field at a different entity, open **Advanced — entity overrides** in the editor and set it there; an override always wins.
 
 On a YAML-mode dashboard, where the visual editor is unavailable, the same card is:
 
 ```yaml
 type: custom:karcher-vacuum-card
-vacuum_entity: vacuum.karcher_rcv5
+vacuum_entity: vacuum.kaercher_rcv_5_vacuum
 ```
 
 Every editor field has a YAML key: `card_height`, `show_debug`, and one `<name>_entity` key per companion entity (`battery_entity`, `map_entity`, `current_room_entity`, …).
@@ -201,9 +201,9 @@ Every editor field has a YAML key: `card_height`, `show_debug`, and one `<name>_
 - Renders the live floor plan; refreshes automatically when the map updates
 - Pinch to zoom, drag to pan once zoomed (ctrl/trackpad scroll on desktop), with a reset-zoom button
 - Room pills on the map are labelled with the room name; the room list below shows each room's mapped area (m²)
-- A floating **Rooms / Zone** control on the map switches what a drag does
+- A **Rooms / Zone** control above the map switches what a drag does
 - **Rooms** — tap a room to select it (highlights); tap again to deselect; **Start** cleans the selected rooms, or the whole home if none are selected
-- **Zone** — drag a rectangle on the map, then press Start to clean just that area
+- **Zone** — drag a rectangle on the map, then tap **Clean area** to clean just that area
 - **Customise tab**, in the sheet below the map — set per-room cleaning order, mode, fan speed, water level, repeat passes, and custom-settings toggle; drag to reorder rooms
 - The active tab (Standard / Customise) is persisted on the robot and restored automatically on page reload, matching the behaviour of the official Kärcher app
 - State-aware control buttons: Play/Pause · Stop · Dock · Locate
@@ -340,7 +340,7 @@ This is expected when Mop-only cleaning mode is selected — the robot has no su
 The map image refreshes on dock and every 10 s during active cleaning. If it never appears, check that the robot has completed at least one full clean (see above) and that `image.<name>_map` is enabled in the entity registry.
 
 **Card shows the wrong entity, or a field stays empty.**
-The card auto-derives every entity from `vacuum_entity`'s stem (see [Lovelace Card](#lovelace-card)); this fails if an entity was renamed away from the standard `<domain>.<stem>_<suffix>` pattern. Set the matching `_entity` override key in the card config to point at the correct entity_id.
+The card looks up every companion entity on the vacuum's own device (see [Lovelace Card](#lovelace-card)). A field stays empty if that entity is disabled in the entity registry; enable it, or set the matching `_entity` override key in the card config to point at the entity you want.
 
 For anything not covered here, download diagnostics (**Settings → Devices & Services → Kärcher Home Robots → ⋮ → Download diagnostics**) and attach them when opening an issue.
 

@@ -45,6 +45,9 @@ export function renderCard(el) {
 
         <ha-alert alert-type="error" class="rcv-region ${v.hasError ? "visible" : ""}">${v.errorText || tr("Robot reported a fault")}</ha-alert>
 
+        <karcher-map-mode class="map-mode rcv-region" .mode=${mapMode} .locked=${v.controlsLocked}
+          @karcher-map-mode=${(e) => el._onMapMode(e)}></karcher-map-mode>
+
         <div class="rcv-map">
           <div class="map-placeholder ${v.mapLoading ? "map-loading" : ""}"
                style=${v.mapLoaded ? "display:none" : ""}>
@@ -70,8 +73,6 @@ export function renderCard(el) {
               <div class="map-edge map-edge-t" style="opacity:${v.edgeFades.top}"></div>
               <div class="map-edge map-edge-b" style="opacity:${v.edgeFades.bottom}"></div>` : ""}
           </div>
-          <karcher-map-mode class="map-mode" .mode=${mapMode} .locked=${v.controlsLocked}
-            @karcher-map-mode=${(e) => el._onMapMode(e)}></karcher-map-mode>
           ${v.mapZoomed && v.mapLoaded ? html`
             <button class="map-reset" title=${tr("Reset zoom")}
               @click=${() => el._resetZoom()}>
@@ -84,8 +85,8 @@ export function renderCard(el) {
           <ha-icon icon=${targetIcon}></ha-icon>
           <span>${mapMode === "zone"
             ? (v.zoneRect
-              ? tr("Drag to move, corners to resize · press Start to clean.")
-              : tr("Drag to draw an area · press Start to clean it."))
+              ? tr("Drag to move, corners to resize · then tap Clean area.")
+              : tr("Drag to draw an area · then tap Clean area."))
             : tr("Tap rooms to select. Empty = whole home.")}</span>
         </div>
 

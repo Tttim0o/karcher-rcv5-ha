@@ -2,9 +2,10 @@ export const CSS_A = `
   :host {
     display: block;
     container-type: inline-size;
-    --rcv-accent: #FFD400;
-    --rcv-accent-deep: #E8BE00;
-    --rcv-accent-text: #1a1a1a;
+    /* Accent follows the HA theme's primary colour (was a fixed Kärcher yellow). */
+    --rcv-accent: var(--primary-color, #03a9f4);
+    --rcv-accent-deep: var(--dark-primary-color, var(--primary-color, #0288d1));
+    --rcv-accent-text: var(--text-primary-color, #fff);
     /* Role tokens — map design roles onto HA theme vars (raw values are
        fallback-only, per the design handoff). New regions reference these so a
        theme swap or a future light/dark tweak happens in one place. */
@@ -17,7 +18,17 @@ export const CSS_A = `
     --rcv-success: var(--success-color, #4caf50);
     --rcv-warning: var(--warning-color, #ff9800);
     --rcv-danger: var(--error-color, #f44336);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, Roboto, Helvetica, Arial, sans-serif;
+    /* HA design tokens: the card follows Home Assistant's own Material look
+       (tile-card features, ha-control-select, dialogs) rather than a custom one.
+       Neutral control fill = HA's control-button background (disabled colour at
+       20%); radii match tile features (12px) and dialogs (24px). */
+    --rcv-control: color-mix(in srgb, var(--disabled-color, #bdbdbd) 20%, transparent);
+    --rcv-accent-soft: rgba(var(--rgb-primary-color, 3, 169, 244), 0.15);
+    --rcv-radius: var(--ha-border-radius-lg, 12px);
+    --rcv-radius-sheet: var(--ha-border-radius-2xl, 24px);
+    --rcv-shadow: var(--ha-box-shadow-m, 0 2px 6px rgba(0,0,0,0.2));
+    font-family: var(--ha-font-family-body, Roboto, Noto, sans-serif);
+    -webkit-font-smoothing: var(--ha-font-smoothing, antialiased);
   }
 
   /* ── single-surface shell ──
@@ -65,9 +76,9 @@ export const CSS_A = `
 
   /* ── robot name ── */
   .robot-name {
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: -0.025em;
+    font-weight: var(--ha-font-weight-medium, 500);
+    font-size: var(--ha-font-size-l, 16px);
+    line-height: 1.4;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -120,19 +131,13 @@ export const CSS_A = `
   .status-dot.dot-offline .status-dot-inner  { background: var(--disabled-color, #9e9e9e); }
 
   .status-label {
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--ha-font-size-m, 14px);
+    font-weight: var(--ha-font-weight-normal, 400);
     color: var(--secondary-text-color);
   }
-  .status-label.label-cleaning { color: var(--success-color, #4caf50); }
-  .status-label.label-paused   { color: var(--warning-color, #ff9800); }
-  .status-label.label-returning,
-  .status-label.label-locating,
-  .status-label.label-emptying { color: var(--primary-color); }
-  .status-label.label-docked,
-  .status-label.label-idle     { color: var(--success-color, #4caf50); }
+  /* As in HA's tile card, the state colour lives on the dot; the text stays
+     secondary. Only a fault is worth colouring the words themselves. */
   .status-label.label-error    { color: var(--error-color, #f44336); }
-  .status-label.label-offline  { color: var(--disabled-color, #9e9e9e); }
 
   /* ── battery glyph ── */
   .battery-wrap {
@@ -142,13 +147,12 @@ export const CSS_A = `
   }
   .battery-icon {
     --mdc-icon-size: 20px;
-    color: var(--success-color, #4caf50);
-    transform: rotate(90deg);
+    color: var(--secondary-text-color);
   }
   .battery-icon.icon-low { color: var(--error-color, #f44336); }
   .battery-pct {
-    font-size: 14px;
-    font-weight: 700;
+    font-size: var(--ha-font-size-m, 14px);
+    font-weight: var(--ha-font-weight-medium, 500);
     color: var(--rcv-text);
     font-variant-numeric: tabular-nums;
   }
@@ -165,18 +169,16 @@ export const CSS_A = `
     flex-direction: column;
     gap: 6px;
     padding: 12px;
-    border-radius: 14px;
-    background: var(--secondary-background-color);
+    border-radius: var(--rcv-radius);
+    background: var(--rcv-control);
   }
   .stat-label-header {
     display: flex;
     align-items: center;
     gap: 4px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-    color: var(--disabled-text-color, rgba(0,0,0,0.4));
+    font-size: var(--ha-font-size-s, 12px);
+    font-weight: var(--ha-font-weight-normal, 400);
+    color: var(--secondary-text-color);
   }
   .stat-label-header ha-icon {
     display: inline-flex;
@@ -184,8 +186,8 @@ export const CSS_A = `
     flex-shrink: 0;
   }
   .stat-value {
-    font-size: 17px;
-    font-weight: 700;
+    font-size: var(--ha-font-size-l, 16px);
+    font-weight: var(--ha-font-weight-medium, 500);
     color: var(--primary-text-color);
     font-variant-numeric: tabular-nums;
   }
@@ -265,29 +267,28 @@ export const CSS_A = `
     .map-edge { transition: none; }
   }
 
-  /* ── floating Rooms|Zone map-mode control (top-left) ── */
+  /* ── Rooms|Zone map-mode control: its own full-width row above the map, like
+     HA's ha-control-select. It used to float over the map's top-left corner,
+     where it covered part of the floor plan (often a whole room label). ── */
   .map-mode {
-    position: absolute;
-    top: 12px;
-    left: 12px;
+    display: block;
+    position: relative;
     z-index: 6;
+    padding: 12px 16px 8px;
+    background: var(--rcv-card);
   }
-  /* Frosted glass over the (always-white) map render, shared by both floating
-     map controls so they read as one family: tinted from the card's own surface
-     colour, so it reads as light glass/dark text in light theme and dark
-     glass/light text in dark theme, instead of staying a dark blob. */
-  .map-mode-inner, .map-reset {
-    background: color-mix(in srgb, var(--rcv-card) 78%, transparent);
-    -webkit-backdrop-filter: blur(10px);
-    backdrop-filter: blur(10px);
-    border: 1px solid color-mix(in srgb, var(--rcv-text) 14%, transparent);
-    box-shadow: 0 6px 20px rgba(0,0,0,0.22);
+  /* The floating reset-zoom control sits over the map: an elevated
+     card-surface container (Material elevation, no frosted glass). */
+  .map-reset {
+    background: var(--rcv-card);
+    box-shadow: var(--rcv-shadow);
   }
   .map-mode-inner {
     display: flex;
-    gap: 3px;
+    gap: 4px;
     padding: 4px;
-    border-radius: 13px;
+    border-radius: var(--rcv-radius);
+    background: var(--rcv-control);
     transition: opacity 0.15s;
   }
   .map-mode-inner.locked { opacity: 0.5; pointer-events: none; }
@@ -295,23 +296,24 @@ export const CSS_A = `
     display: flex;
     align-items: center;
     gap: 7px;
-    height: 36px;
-    padding: 0 13px;
+    flex: 1;
+    justify-content: center;
+    height: 34px;
+    padding: 0 12px;
     border: none;
-    border-radius: 10px;
+    border-radius: 9px;
     cursor: pointer;
     font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
+    font-size: var(--ha-font-size-m, 14px);
+    font-weight: var(--ha-font-weight-medium, 500);
     background: transparent;
-    color: color-mix(in srgb, var(--rcv-text) 82%, transparent);
+    color: var(--primary-text-color);
     transition: background 0.14s, color 0.14s;
-    --mdc-icon-size: 16px;
+    --mdc-icon-size: 18px;
   }
   .map-mode-btn.active {
     background: var(--rcv-accent);
     color: var(--rcv-accent-text);
-    font-weight: 800;
   }
 
   /* ── floating reset-zoom control (top-right, only while zoomed in) ── */
@@ -323,14 +325,15 @@ export const CSS_A = `
     display: flex;
     align-items: center;
     gap: 7px;
-    height: 44px;
-    padding: 0 13px;
-    border-radius: 13px;
+    height: 38px;
+    padding: 0 12px;
+    border: none;
+    border-radius: var(--rcv-radius);
     cursor: pointer;
     font-family: inherit;
-    font-size: 13px;
-    font-weight: 600;
-    color: color-mix(in srgb, var(--rcv-text) 82%, transparent);
+    font-size: var(--ha-font-size-m, 14px);
+    font-weight: var(--ha-font-weight-medium, 500);
+    color: var(--primary-text-color);
     --mdc-icon-size: 20px;
   }
 
@@ -339,14 +342,16 @@ export const CSS_A = `
   .map-hint {
     display: flex;
     align-items: center;
-    gap: 9px;
-    padding: 9px 13px;
-    margin: 8px 12px;
-    border-radius: 11px;
-    background: var(--rcv-inset);
+    gap: 8px;
+    padding: 8px 16px 0;
   }
-  .map-hint ha-icon { --mdc-icon-size: 15px; color: var(--rcv-accent); flex-shrink: 0; }
-  .map-hint span { font-size: 12.5px; font-weight: 600; color: var(--rcv-text2); line-height: 1.35; }
+  .map-hint ha-icon { --mdc-icon-size: 16px; color: var(--secondary-text-color); flex-shrink: 0; }
+  .map-hint span {
+    font-size: var(--ha-font-size-s, 12px);
+    font-weight: var(--ha-font-weight-normal, 400);
+    color: var(--secondary-text-color);
+    line-height: 1.4;
+  }
   .map-hint.hint-hidden { display: none; }
   .map-hint.hint-locked { opacity: 0.5; }
   .legend { padding: 8px 4px 0; }
@@ -403,49 +408,43 @@ export const CSS_A = `
     gap: 10px;
   }
   .btn-wrap {
-    height: 54px;
-    border-radius: 16px;
+    height: 48px;
+    border-radius: var(--rcv-radius);
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    border: 1px solid var(--rcv-divider);
-    background: var(--rcv-inset);
-    color: var(--rcv-text2);
+    border: none;
+    background: var(--rcv-control);
+    color: var(--primary-text-color);
     font-family: inherit;
     cursor: pointer;
     padding: 0;
     --mdc-icon-size: 24px;
-    transition: transform 0.12s ease, background 0.15s, box-shadow 0.15s;
+    transition: background 0.15s, filter 0.15s;
   }
+  .btn-wrap:not(.disabled):not(:disabled):hover { filter: brightness(1.08); }
   .btn-wrap.primary {
     flex: 1;
     background: var(--rcv-accent);
-    border: none;
     color: var(--rcv-accent-text);
-    box-shadow: 0 6px 18px color-mix(in srgb, var(--rcv-accent) 45%, transparent);
   }
   .btn-wrap.danger,
   .btn-wrap.secondary {
-    flex: 0 0 54px;
-    width: 54px;
+    flex: 0 0 48px;
+    width: 48px;
   }
   .btn-wrap.danger { color: var(--rcv-danger); }
   .btn-wrap.disabled,
   .btn-wrap:disabled {
-    background: var(--rcv-inset);
-    border: 1px solid var(--rcv-divider);
-    color: var(--rcv-text3);
-    box-shadow: none;
+    background: var(--rcv-control);
+    color: var(--disabled-text-color, var(--rcv-text3));
     cursor: default;
-    opacity: 0.55;
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .btn-wrap:not(.disabled):not(:disabled):active { transform: scale(0.93); }
+    opacity: 0.6;
   }
   .btn-wrap .btn-label {
-    font-size: 16px;
-    font-weight: 800;
+    font-size: var(--ha-font-size-m, 14px);
+    font-weight: var(--ha-font-weight-medium, 500);
     line-height: 1;
     white-space: nowrap;
   }

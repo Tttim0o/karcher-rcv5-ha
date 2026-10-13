@@ -3,7 +3,7 @@ import { tr } from "./i18n.js";
 import { MAP_MODE_ICON } from "./constants.js";
 
 // ---------------------------------------------------------------------------
-// Lit leaf: floating Rooms|Zone map-mode control (top-left of the map hero).
+// Lit leaf: Rooms|Zone map-mode control (its own row directly above the map).
 //
 // The map-interaction axis, split out from the old 3-way settings tab. Light DOM
 // (inherits .map-mode CSS). Data down: the shell sets `.mode` ("rooms" | "zone")

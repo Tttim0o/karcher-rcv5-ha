@@ -1,3 +1,4 @@
+import { companionEntity } from "./card-view.js";
 import { computeDrawKey, drawMap, pathArcLength, revealPath, lerpAngle } from "./map-draw.js";
 import { clampPan } from "./geometry.js";
 import { isBusy, isUsableValue } from "./derive.js";
@@ -31,7 +32,7 @@ export function sizeCanvasIfNeeded(el) {
   }
 
 export function updateMap(el, attr) {
-    const mapEntity = el._config.map_entity;
+    const mapEntity = companionEntity(el, "map_entity");
     const mapState = mapEntity ? el.hass.states[mapEntity] : null;
     if (!mapState) return;
 
