@@ -10,7 +10,7 @@ import { tr } from "./i18n.js";
 // routes to `_drive()`.
 //
 // One press is one nudge — the robot performs a short movement and stops, it
-// does not latch a heading (doc/PROTOCOL.md §16). Holding a course therefore
+// does not latch a heading (doc/PROTOCOL.md §17). Holding a course therefore
 // means pressing repeatedly, so the buttons are deliberately cheap to hit
 // repeatedly and carry no "pressed" latch state.
 // ---------------------------------------------------------------------------
