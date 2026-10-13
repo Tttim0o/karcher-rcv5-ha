@@ -53,6 +53,28 @@ async def test_reset_button_sends_reset_consumable(
     assert fake.commands_sent == [("reset_consumable", {"consumable": expected_type})]
 
 
+@pytest.mark.parametrize(
+    "entity_id,expected_direction",
+    [
+        # Values device-verified on an RCV5 (const.py): 1 fwd, 2 left, 3 right, 4 back.
+        ("button.test_robot_drive_forward", 1),
+        ("button.test_robot_turn_left", 2),
+        ("button.test_robot_turn_right", 3),
+        ("button.test_robot_drive_backward", 4),
+    ],
+)
+async def test_drive_button_sends_set_direction(
+    hass: HomeAssistant, entity_id: str, expected_direction: int
+) -> None:
+    """Each manual-drive button publishes one set_direction nudge."""
+    fake = FakeAdapter(props=PROPS_IDLE)
+    await _setup(hass, fake)
+
+    await hass.services.async_call("button", "press", {"entity_id": entity_id}, blocking=True)
+
+    assert fake.commands_sent == [("set_direction", {"direction": expected_direction})]
+
+
 async def test_empty_station_button_sends_start_station_act(hass: HomeAssistant) -> None:
     """Pressing the empty-station button dispatches start_station_act with ctrl_value=1."""
     props = make_props(work_mode=0, status=4, charge_state=1, fault=0, charge_station_type=1)

@@ -15,6 +15,8 @@ a CI gate (ADR-0004).
 ### Phase: 6 — Map polish, reconnect hardening, and pinch-zoom/pan
 
 ### Added
+- Manual drive: four button entities (drive forward / backward, turn left / right) that nudge
+  the robot one step per press, plus a standalone `karcher-dpad-card` Lovelace card.
 - Localization: full Romanian, German, French, Italian, Spanish, and Dutch translations
   for every Home Assistant string and all Lovelace card text; each loads automatically when
   the Home Assistant language matches. Dutch translation contributed by @macbos.
@@ -70,6 +72,8 @@ a CI gate (ADR-0004).
   longer blames an unrecognized robot model — those now set up normally.
 
 ### Fixed
+- A DNS or network failure while opening the MQTT connection at setup no longer leaves the
+  integration permanently failed; Home Assistant now retries it.
 - The "vacuum segments have changed" repair no longer appears while the robot is
   relocalizing, and now disappears on its own once the robot reports its rooms again.
 - A cleaning-mode switch or per-room setting that fails to reach the robot no longer

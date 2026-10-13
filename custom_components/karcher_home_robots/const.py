@@ -22,6 +22,16 @@ WORK_MODE_IDLE: frozenset[int] = frozenset({0, 14, 23, 29, 35, 40, 85})
 # decide — exactly as the app does — rather than tracking local state.
 WORK_MODE_ZONE_CLEAN: frozenset[int] = frozenset({30, 31, 32, 35})
 
+# Manual drive (service.set_direction "direction") values.
+# Device-verified on an RCV5 2026-08-23 by publishing each value and observing
+# the robot: 1/2/3/4 drive it, every other value tried in -2..10 is inert.
+# Each publish is a single nudge, not a latched heading — the app repeats the
+# publish while the on-screen arrow is held. See doc/PROTOCOL.md §16.
+DIRECTION_FORWARD = 1
+DIRECTION_LEFT = 2
+DIRECTION_RIGHT = 3
+DIRECTION_BACKWARD = 4
+
 # Cleaning mode (prop.set "mode") values.
 # Source: doc/PROTOCOL.md §5, traffic capture 2026-03-29.
 CLEANING_MODE_VACUUM = 0
