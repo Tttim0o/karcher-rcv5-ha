@@ -38,13 +38,19 @@ loop, so its state never resets.
    sensor:
      - platform: karcher_demo_card
    ```
-3. Restart HA. `vacuum.demo_card`, `image.demo_card_map`, and
-   `sensor.demo_card_battery` now exist, holding the fixture data forever.
+3. Restart HA. `vacuum.karcher_rcv5` (the demo vacuum is named "Kärcher RCV5"
+   and has no device, so that is the id HA assigns), `image.demo_card_map`,
+   and `sensor.demo_card_battery` now exist, holding the fixture data forever.
 4. Register the card resource (Settings → Dashboards → Resources →
-   `/local/karcher-vacuum-card.js`) and add a `custom:karcher-vacuum-card`
-   card with `entity: vacuum.demo_card` and `map_entity: image.demo_card_map`
-   (the card auto-derives `battery_entity: sensor.demo_card_battery` from
-   the vacuum entity id).
+   `/local/karcher-vacuum-card.js`) and add the card. The demo entities are not
+   on a device, so the card cannot find its companions by itself — set them
+   explicitly:
+   ```yaml
+   type: custom:karcher-vacuum-card
+   vacuum_entity: vacuum.karcher_rcv5
+   map_entity: image.demo_card_map
+   battery_entity: sensor.demo_card_battery
+   ```
 
 ## 3. Screenshot
 

@@ -70,6 +70,15 @@ a CI gate (ADR-0004).
   longer blames an unrecognized robot model — those now set up normally.
 
 ### Fixed
+- Lovelace card: the map, battery, stats and settings now load on current installs. The card
+  looked for companion entities under names derived from the vacuum entity (`…_vacuum_map`,
+  `…_vacuum_battery`), which do not exist; it now finds them on the vacuum's own device.
+- Lovelace card: the map no longer gets stuck on "loading", and the robot icon no longer goes
+  missing, after Home Assistant re-attaches the card (dashboard load, view switch).
+- A leftover second registration of the card resource is removed automatically, so browsers
+  cannot keep loading an old card build from it.
+- A DNS or network failure while opening the MQTT connection at setup no longer leaves the
+  integration permanently failed; Home Assistant now retries it.
 - The "vacuum segments have changed" repair no longer appears while the robot is
   relocalizing, and now disappears on its own once the robot reports its rooms again.
 - A cleaning-mode switch or per-room setting that fails to reach the robot no longer

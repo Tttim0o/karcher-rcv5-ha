@@ -1,5 +1,5 @@
 import { tr, setLang, STATUS_SLUG_LABELS, STATE_LABELS, countLabels } from "./i18n.js";
-import {
+import { _EDITOR_COMPANIONS,
   isOccupied, isBusy, isUsableValue, isUsableState, batteryIcon, BATTERY_LOW_THRESHOLD,
   primaryCleanLabel, targetStripLabel, deriveStatTiles, deriveSelectorRows, deriveRoomRows,
   parseRoomOrder, reconcileCustomise,
@@ -98,7 +98,7 @@ function deriveStatus(el, attr, activity, isOffline) {
     }
     const slugLabel = attr.status_label ? (STATUS_SLUG_LABELS[attr.status_label] || attr.status_label) : null;
     let statusText = tr(slugLabel || STATE_LABELS[activity] || activity);
-    const roomEntity = el._config.current_room_entity;
+    const roomEntity = companionEntity(el, "current_room_entity");
     if (activity === "cleaning" && roomEntity) {
       const r = el.hass.states[roomEntity]?.state;
       if (isUsableValue(r)) statusText += ` · ${r}`;
@@ -125,10 +125,9 @@ function deriveErrorText(el, hasError) {
   }
 
 export function deriveView(el, attr, activity) {
-    const cfg = el._config;
     const isOffline = el._isOffline();
     const { statusText, dotClass, labelClass } = deriveStatus(el, attr, activity, isOffline);
-    const errEntity = cfg.error_entity;
+    const errEntity = companionEntity(el, "error_entity");
     const hasError = activity === "error" ||
       (errEntity && el.hass.states[errEntity]?.state === "on");
     const errorText = deriveErrorText(el, hasError);
@@ -205,7 +204,7 @@ export function edgeFades(el) {
   }
 
 export function mapPlaceholderView(el, attr) {
-    const mapEntity = el._config.map_entity;
+    const mapEntity = companionEntity(el, "map_entity");
     if (!mapEntity) return { placeholderText: tr("Set map_entity in card config") };
     if (!el.hass.states[mapEntity]) return { placeholderText: `${tr("Entity not found")}: ${mapEntity}` };
     const sz = attr.map_image_size;
@@ -221,7 +220,7 @@ export function mapPlaceholderView(el, attr) {
   }
 
 export function batteryView(el) {
-    const battEntity = el._config.battery_entity;
+    const battEntity = companionEntity(el, "battery_entity");
     if (battEntity) {
       const b = el.hass.states[battEntity];
       const pct = isUsableState(b) ? parseInt(b.state, 10) : NaN;
@@ -232,7 +231,7 @@ export function batteryView(el) {
       // are all false for NaN, so it fell through to "low"). deriveStatTiles
       // already guards its own parse this way; match it and hide the readout.
       if (!isNaN(pct)) {
-        const chargingEntity = el._config.charging_entity;
+        const chargingEntity = companionEntity(el, "charging_entity");
         const isCharging = chargingEntity
           ? el.hass.states[chargingEntity]?.state === "on" : false;
         return {
@@ -247,17 +246,17 @@ export function batteryView(el) {
   }
 
 export function statTiles(el) {
-    const areaState = el.hass.states[el._config.cleaning_area_entity];
-    const timeState = el.hass.states[el._config.cleaning_time_entity];
+    const areaState = el.hass.states[companionEntity(el, "cleaning_area_entity")];
+    const timeState = el.hass.states[companionEntity(el, "cleaning_time_entity")];
     const occupied = isOccupied(el._vacState()?.state);
     return deriveStatTiles(areaState, timeState, occupied);
   }
 
 export function selectorRows(el, attr) {
     if (el._cardMode === "customise") return [];
-    const modeEntityId = el._config.cleaning_mode_entity;
+    const modeEntityId = companionEntity(el, "cleaning_mode_entity");
     const modeState = modeEntityId ? el.hass.states[modeEntityId] : null;
-    const waterEntityId = el._config.water_level_entity;
+    const waterEntityId = companionEntity(el, "water_level_entity");
     // undefined (not null) when no entity configured → deriveSelectorRows omits
     // the water row; a configured-but-missing entity yields a disabled row.
     const waterState = waterEntityId ? (el.hass.states[waterEntityId] ?? null) : undefined;
@@ -343,6 +342,7 @@ export function viewState(el, attr) {
     };
   }
 
+
 // Resolve a companion entity_id, tolerating a wrong derived/configured guess.
 // deriveCompanions() guesses `<domain>.<vacuum_entity_stem>_<suffix>`, which is
 // only correct if the stem HA actually assigned to every entity on this device
@@ -356,16 +356,36 @@ export function viewState(el, attr) {
 export function resolveCompanionEntity(el, cfgKey, translationKey) {
     const cfgId = el._config?.[cfgKey];
     if (cfgId && el.hass?.states[cfgId]) return cfgId;
-    const vac = el._config?.vacuum_entity;
-    const deviceId = el.hass?.entities?.[vac]?.device_id;
-    if (deviceId) {
-      for (const [entityId, entry] of Object.entries(el.hass.entities)) {
+    const entities = el.hass?.entities;
+    const deviceId = entities?.[el._config?.vacuum_entity]?.device_id;
+    if (!deviceId || !translationKey) return cfgId;
+    // The registry scan runs on every hass update for every companion, so cache
+    // per registry object: HA replaces hass.entities whenever it changes.
+    if (el._companionCache?.entities !== entities || el._companionCache?.deviceId !== deviceId) {
+      el._companionCache = { entities, deviceId, byKey: new Map() };
+    }
+    const cache = el._companionCache.byKey;
+    if (!cache.has(translationKey)) {
+      let found = null;
+      for (const [entityId, entry] of Object.entries(entities)) {
         if (entry.device_id === deviceId && entry.translation_key === translationKey) {
-          return entityId;
+          found = entityId;
+          break;
         }
       }
+      cache.set(translationKey, found);
     }
-    return cfgId;
+    return cache.get(translationKey) ?? cfgId;
+  }
+
+// Live entity_id for any companion config key (battery_entity, map_entity, ...).
+// The derived `<domain>.<stem>_<suffix>` default is only a guess: the vacuum
+// entity is named ("…_vacuum"), so on current installs the stem carries that
+// suffix and every derived companion id was wrong — the map, battery, stats and
+// selectors all silently resolved to entities that do not exist.
+const _TK_BY_KEY = Object.fromEntries(_EDITOR_COMPANIONS.map((c) => [c.key, c.tk]));
+export function companionEntity(el, cfgKey) {
+    return resolveCompanionEntity(el, cfgKey, _TK_BY_KEY[cfgKey]);
   }
 
 export function resolveFaultEntity(el) {
