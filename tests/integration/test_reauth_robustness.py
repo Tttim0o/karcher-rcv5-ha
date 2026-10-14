@@ -13,6 +13,7 @@ from custom_components.karcher_home_robots.coordinator import KarcherCoordinator
 from custom_components.karcher_home_robots.exceptions import (
     AuthError,
     InvalidCredentials,
+    NetworkError,
     TokenRejected,
     TransientError,
 )
@@ -266,3 +267,23 @@ async def test_silent_reauth_skips_login_when_token_already_refreshed(
         await adapter.silent_reauth()
 
     login_mock.assert_not_awaited()
+
+
+# ---------------------------------------------------------------------------
+# subscribe: raw socket failures from the MQTT connect
+# ---------------------------------------------------------------------------
+
+
+async def test_subscribe_dns_failure_raises_network_error(
+    fake_hass_for_adapter: MagicMock,
+) -> None:
+    """A DNS failure inside the MQTT connect maps to a retryable NetworkError."""
+    import socket
+
+    adapter = await _make_adapter(fake_hass_for_adapter)
+    adapter._client.subscribe_device = MagicMock(  # type: ignore[union-attr]
+        side_effect=socket.gaierror(-3, "Temporary failure in name resolution")
+    )
+
+    with pytest.raises(NetworkError):
+        await adapter.subscribe(TEST_DEVICE, lambda _props: None)

@@ -740,6 +740,12 @@ class KarcherAdapter:
             )
         except KarcherHomeException as exc:
             raise _translate_exception(exc) from exc
+        except OSError as exc:
+            # subscribe_device opens the MQTT connection through paho, which
+            # resolves and connects with raw sockets: a DNS hiccup surfaces as
+            # socket.gaierror, not a KarcherHomeException. Unmapped, it escaped
+            # async_setup_entry as SETUP_ERROR, which Home Assistant never retries.
+            raise NetworkError(str(exc)) from exc
 
         # Install a single dispatching handler on the MQTT client.  On subsequent
         # subscribe() calls the handler is usually already in place (it reads from
