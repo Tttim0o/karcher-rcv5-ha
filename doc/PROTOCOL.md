@@ -2334,3 +2334,36 @@ the RVF 7 pair's `wind`. Everything else in the table is recorded, not applied:
   whether the app sends the index on the wire is unconfirmed. A raw 3 on an RVF 7 would show up as a
   novel value.
 - The RVM 4 is community-verified on the 0-based scale, and "max" (5) is not obviously "turbo".
+
+---
+
+## 17. Manual Drive (D-pad)
+
+The app's Robot Settings → Remote control pad drives the robot with one service command:
+
+```
+service: set_direction
+params:  {"direction": <int>}
+```
+
+| `direction` | Movement |
+|---|---|
+| `1` | forward |
+| `2` | turn left |
+| `3` | turn right |
+| `4` | backward |
+
+Device-verified on an RCV 5 (2026-08-23) by publishing each value and watching the robot:
+`1`–`4` drive it; every other value tried in `-2..10` is inert.
+
+- **One publish is one nudge.** The robot makes a short movement and stops; it does not
+  latch a heading. The app repeats the publish while an on-screen arrow is held, so
+  holding a course means sending repeatedly.
+- **Stopping manual drive** is `set_room_clean {clean_type: 0, ctrl_value: 0, room_ids: []}`
+  — the app's `ManualControlActivity.onBackPressed` (§5), the same command `vacuum.stop` sends.
+- **Command verification is skipped.** The first nudge out of idle changes `work_mode`, but
+  later nudges in the same burst land while the robot is already in that mode, so verifying
+  each against `work_mode` would log a false-positive warning for every press after the first.
+
+The firmware side is the `SetRemoteControl` cloud op noted in §9, which parses
+`direction`/`ctrlValue` into a motion-layer message.

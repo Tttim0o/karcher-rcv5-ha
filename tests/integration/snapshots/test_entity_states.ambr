@@ -252,6 +252,106 @@
     'state': 'unknown',
   })
 # ---
+# name: test_all_entities_snapshot[button.test_robot_drive_backward-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': None,
+    'entity_id': 'button.test_robot_drive_backward',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Drive backward',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Drive backward',
+    'platform': 'karcher_home_robots',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'drive_backward',
+    'unique_id': 'test-device-id-1_drive_backward',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_drive_backward-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Drive backward',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.test_robot_drive_backward',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_drive_forward-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': None,
+    'entity_id': 'button.test_robot_drive_forward',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Drive forward',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Drive forward',
+    'platform': 'karcher_home_robots',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'drive_forward',
+    'unique_id': 'test-device-id-1_drive_forward',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_drive_forward-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Drive forward',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.test_robot_drive_forward',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---
 # name: test_all_entities_snapshot[button.test_robot_empty_station-entry]
   EntityRegistryEntrySnapshot({
     'aliases': list([
@@ -496,6 +596,106 @@
     }),
     'context': <ANY>,
     'entity_id': 'button.test_robot_reset_side_brush',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_turn_left-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': None,
+    'entity_id': 'button.test_robot_turn_left',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Turn left',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Turn left',
+    'platform': 'karcher_home_robots',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'drive_left',
+    'unique_id': 'test-device-id-1_drive_left',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_turn_left-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Turn left',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.test_robot_turn_left',
+    'last_changed': <ANY>,
+    'last_reported': <ANY>,
+    'last_updated': <ANY>,
+    'state': 'unknown',
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_turn_right-entry]
+  EntityRegistryEntrySnapshot({
+    'aliases': list([
+      None,
+    ]),
+    'area_id': None,
+    'capabilities': None,
+    'config_entry_id': <ANY>,
+    'config_subentry_id': <ANY>,
+    'device_class': None,
+    'device_id': <ANY>,
+    'disabled_by': None,
+    'domain': 'button',
+    'entity_category': None,
+    'entity_id': 'button.test_robot_turn_right',
+    'has_entity_name': True,
+    'hidden_by': None,
+    'icon': None,
+    'id': <ANY>,
+    'labels': set({
+    }),
+    'name': None,
+    'object_id_base': 'Turn right',
+    'options': dict({
+    }),
+    'original_device_class': None,
+    'original_icon': None,
+    'original_name': 'Turn right',
+    'platform': 'karcher_home_robots',
+    'previous_unique_id': None,
+    'suggested_object_id': None,
+    'supported_features': 0,
+    'translation_key': 'drive_right',
+    'unique_id': 'test-device-id-1_drive_right',
+    'unit_of_measurement': None,
+  })
+# ---
+# name: test_all_entities_snapshot[button.test_robot_turn_right-state]
+  StateSnapshot({
+    'attributes': ReadOnlyDict({
+      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Turn right',
+    }),
+    'context': <ANY>,
+    'entity_id': 'button.test_robot_turn_right',
     'last_changed': <ANY>,
     'last_reported': <ANY>,
     'last_updated': <ANY>,
