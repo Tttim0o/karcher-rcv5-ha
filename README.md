@@ -201,9 +201,9 @@ Every editor field has a YAML key: `card_height`, `show_debug`, and one `<name>_
 - Renders the live floor plan; refreshes automatically when the map updates
 - Pinch to zoom, drag to pan once zoomed (ctrl/trackpad scroll on desktop), with a reset-zoom button
 - Room pills on the map are labelled with the room name; the room list below shows each room's mapped area (m²)
-- A floating **Rooms / Zone** control on the map switches what a drag does
+- A **Rooms / Zone** control above the map switches what a drag does
 - **Rooms** — tap a room to select it (highlights); tap again to deselect; **Start** cleans the selected rooms, or the whole home if none are selected
-- **Zone** — drag a rectangle on the map, then press Start to clean just that area
+- **Zone** — drag a rectangle on the map, then tap **Clean area** to clean just that area
 - **Customise tab**, in the sheet below the map — set per-room cleaning order, mode, fan speed, water level, repeat passes, and custom-settings toggle; drag to reorder rooms
 - The active tab (Standard / Customise) is persisted on the robot and restored automatically on page reload, matching the behaviour of the official Kärcher app
 - State-aware control buttons: Play/Pause · Stop · Dock · Locate

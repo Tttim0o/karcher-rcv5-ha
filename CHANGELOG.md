@@ -14,6 +14,11 @@ a CI gate (ADR-0004).
 
 ### Phase: 6 — Map polish, reconnect hardening, and pinch-zoom/pan
 
+### Changed
+- Lovelace card follows Home Assistant's own look: the theme colour instead of the fixed yellow,
+  HA fonts, tonal controls, tabs and chips; the Rooms / Zone control sits above the map instead
+  of covering it, and zone hints name the actual button (Clean area).
+
 ### Added
 - Localization: full Romanian, German, French, Italian, Spanish, and Dutch translations
   for every Home Assistant string and all Lovelace card text; each loads automatically when

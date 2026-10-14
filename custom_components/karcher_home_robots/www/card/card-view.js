@@ -340,7 +340,24 @@ export function viewState(el, attr) {
       zoneEditable: !el._controlsLocked(activity),
       zoom: el._zoom,
       pan: el._pan,
+      accentRgb: themeAccentRgb(el),
     };
+  }
+
+// The theme's primary colour as "r, g, b" for canvas paint (see map-draw.js).
+// getComputedStyle is too costly per reveal frame, so it is re-read only when
+// HA hands over a new themes object (theme or dark-mode switch).
+function themeAccentRgb(el) {
+    const themes = el.hass?.themes;
+    if (el._accentCache && el._accentCache.themes === themes) return el._accentCache.rgb;
+    let rgb;
+    try {
+      rgb = getComputedStyle(el).getPropertyValue("--rgb-primary-color").trim();
+    } catch {
+      rgb = "";
+    }
+    el._accentCache = { themes, rgb };
+    return rgb;
   }
 
 // Resolve a companion entity_id, tolerating a wrong derived/configured guess.
