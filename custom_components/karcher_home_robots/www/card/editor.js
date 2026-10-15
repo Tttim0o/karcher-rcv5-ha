@@ -2,6 +2,7 @@ import { LitElement, html } from "../lit-core.js";
 import { tr, setLang } from "./i18n.js";
 import { nextEditorConfig, deriveCompanions, _EDITOR_COMPANIONS } from "./derive.js";
 import { _EDITOR_CSS } from "./styles.js";
+import { isHaStyle } from "./constants.js";
 
 // Stable per-domain arrays for ha-entity-picker's `includeDomains` so a re-render
 // passes the same reference (a fresh `[domain]` each time would force the picker
@@ -65,6 +66,15 @@ class KarcherVacuumCardEditor extends LitElement {
     this._emitConfig();
   }
 
+  // Opt-in stock Home Assistant look. Set when on, deleted when off.
+  _onStyleToggle(e) {
+    const next = { ...this._config };
+    if (e.target.checked) next.card_style = "ha";
+    else delete next.card_style;
+    this._config = next;
+    this._emitConfig();
+  }
+
   _picker(configKey, domain, label, required = false) {
     const derived = deriveCompanions(this._config.vacuum_entity);
     const value = this._config[configKey] || derived[configKey] || "";
@@ -99,6 +109,14 @@ class KarcherVacuumCardEditor extends LitElement {
           <ha-switch
             .checked=${!!this._config.show_debug}
             @change=${(e) => this._onDebugToggle(e)}
+          ></ha-switch>
+        </ha-formfield>
+      </div>
+      <div class="field">
+        <ha-formfield label=${tr("Use the Home Assistant look (theme colours and fonts)")}>
+          <ha-switch
+            .checked=${isHaStyle(this._config)}
+            @change=${(e) => this._onStyleToggle(e)}
           ></ha-switch>
         </ha-formfield>
       </div>

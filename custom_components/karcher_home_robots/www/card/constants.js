@@ -1,6 +1,10 @@
 // Versions the Lovelace card only, not the HA integration (manifest.json) or
 // the Python package (pyproject.toml). Intentionally divergent — do not unify.
-export const VERSION = "1.36.10";
+export const VERSION = "1.37.0";
+
+// Opt-in stock Home Assistant look (config key card_style: "ha"); anything else
+// keeps the classic Kärcher look.
+export const isHaStyle = (config) => config?.card_style === "ha";
 
 // Map-mode -> icon, single source for the floating control, the map-hint icon,
 // and the target-strip icon.

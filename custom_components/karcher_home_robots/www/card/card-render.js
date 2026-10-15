@@ -1,8 +1,8 @@
 import { html } from "../lit-core.js";
 import { tr } from "./i18n.js";
-import { MAP_MODE_ICON, VERSION } from "./constants.js";
+import { MAP_MODE_ICON, VERSION, isHaStyle } from "./constants.js";
 import { buildDebugRows, NO_ROOMS_MESSAGE } from "./derive.js";
-import { _CSS } from "./styles.js";
+import { _CSS, _CSS_HA } from "./styles.js";
 
 // Shell render template + clean-target sub-template (operate on the card element).
 
@@ -19,9 +19,15 @@ export function renderCard(el) {
     const sheetOpen = !!el._sheetOpen;
     const sheetTab = el._sheetTab || "target";
     const targetIcon = MAP_MODE_ICON[mapMode];
+    // HA style puts the Rooms|Zone control in its own row above the map; classic
+    // floats it over the map's top-left corner.
+    const haStyle = isHaStyle(el._config);
+    const mapModeControl = html`
+      <karcher-map-mode class="map-mode ${haStyle ? "rcv-region" : ""}" .mode=${mapMode} .locked=${v.controlsLocked}
+        @karcher-map-mode=${(e) => el._onMapMode(e)}></karcher-map-mode>`;
     return html`
-      <style>${_CSS}</style>
-      <ha-card class="card-shell" style=${el._config?.card_height
+      <style>${haStyle ? _CSS_HA : _CSS}</style>
+      <ha-card class="card-shell ${haStyle ? "style-ha" : ""}" style=${el._config?.card_height
         ? `height:${el._config.card_height}px;min-height:${el._config.card_height}px`
         : ""}>
         <div class="top-bar rcv-region">
@@ -44,6 +50,8 @@ export function renderCard(el) {
         </div>
 
         <ha-alert alert-type="error" class="rcv-region ${v.hasError ? "visible" : ""}">${v.errorText || tr("Robot reported a fault")}</ha-alert>
+
+        ${haStyle ? mapModeControl : ""}
 
         <div class="rcv-map">
           <div class="map-placeholder ${v.mapLoading ? "map-loading" : ""}"
@@ -70,8 +78,7 @@ export function renderCard(el) {
               <div class="map-edge map-edge-t" style="opacity:${v.edgeFades.top}"></div>
               <div class="map-edge map-edge-b" style="opacity:${v.edgeFades.bottom}"></div>` : ""}
           </div>
-          <karcher-map-mode class="map-mode" .mode=${mapMode} .locked=${v.controlsLocked}
-            @karcher-map-mode=${(e) => el._onMapMode(e)}></karcher-map-mode>
+          ${haStyle ? "" : mapModeControl}
           ${v.mapZoomed && v.mapLoaded ? html`
             <button class="map-reset" title=${tr("Reset zoom")}
               @click=${() => el._resetZoom()}>
@@ -84,8 +91,8 @@ export function renderCard(el) {
           <ha-icon icon=${targetIcon}></ha-icon>
           <span>${mapMode === "zone"
             ? (v.zoneRect
-              ? tr("Drag to move, corners to resize · press Start to clean.")
-              : tr("Drag to draw an area · press Start to clean it."))
+              ? tr("Drag to move, corners to resize · then tap Clean area.")
+              : tr("Drag to draw an area · then tap Clean area."))
             : tr("Tap rooms to select. Empty = whole home.")}</span>
         </div>
 

@@ -194,16 +194,20 @@ type: custom:karcher-vacuum-card
 vacuum_entity: vacuum.my_robot_vacuum
 ```
 
-Every editor field has a YAML key: `card_height`, `show_debug`, and one `<name>_entity` key per companion entity (`battery_entity`, `map_entity`, `current_room_entity`, …).
+Every editor field has a YAML key: `card_height`, `show_debug`, `card_style`, and one `<name>_entity` key per companion entity (`battery_entity`, `map_entity`, `current_room_entity`, …).
+
+### Card look
+
+The card keeps its Kärcher look (yellow accent) by default. To match your Home Assistant theme instead, turn on **Use the Home Assistant look** in the card editor, or set `card_style: ha`. That look uses the theme's primary colour, Home Assistant's fonts and tonal controls, and puts the Rooms / Zone control in its own row above the map.
 
 ### Card capabilities
 
 - Renders the live floor plan; refreshes automatically when the map updates
 - Pinch to zoom, drag to pan once zoomed (ctrl/trackpad scroll on desktop), with a reset-zoom button
 - Room pills on the map are labelled with the room name; the room list below shows each room's mapped area (m²)
-- A floating **Rooms / Zone** control on the map switches what a drag does
+- A **Rooms / Zone** control switches what a drag does (floating on the map; with the Home Assistant look, in its own row above it)
 - **Rooms** — tap a room to select it (highlights); tap again to deselect; **Start** cleans the selected rooms, or the whole home if none are selected
-- **Zone** — drag a rectangle on the map, then press Start to clean just that area
+- **Zone** — drag a rectangle on the map, then tap **Clean area** to clean just that area
 - **Customise tab**, in the sheet below the map — set per-room cleaning order, mode, fan speed, water level, repeat passes, and custom-settings toggle; drag to reorder rooms
 - The active tab (Standard / Customise) is persisted on the robot and restored automatically on page reload, matching the behaviour of the official Kärcher app
 - State-aware control buttons: Play/Pause · Stop · Dock · Locate

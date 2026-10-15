@@ -15,6 +15,9 @@ a CI gate (ADR-0004).
 ### Phase: 6 — Map polish, reconnect hardening, and pinch-zoom/pan
 
 ### Added
+- Lovelace card: optional Home Assistant look (`card_style: ha`, or the editor switch) —
+  theme colour, HA fonts, tonal controls, tabs and chips, with the Rooms / Zone control in its
+  own row above the map. The default look is unchanged.
 - Localization: full Romanian, German, French, Italian, Spanish, and Dutch translations
   for every Home Assistant string and all Lovelace card text; each loads automatically when
   the Home Assistant language matches. Dutch translation contributed by @macbos.
@@ -49,6 +52,7 @@ a CI gate (ADR-0004).
   display, matching the app's Privacy & Security / Carpet Settings screens.
 
 ### Changed
+- Lovelace card: zone hints name the actual button ("tap Clean area") instead of "press Start".
 - Minimum Home Assistant version is now 2026.10.0.
 - Devices now show their actual model instead of always reporting "RCV5", and every model
   gets the full entity set with a published support level saying how much evidence backs it.
