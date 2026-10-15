@@ -66,7 +66,7 @@ test = [
   "hypothesis>=6.168.5,<7",
 ]
 dev = [
-  "ruff>=0.16.10,<1",
+  "ruff>=0.17.0,<1",
   "mypy>=2.4.0,<3",
   "pre-commit>=4.6.2,<5",
   # Used by tests/tools/check_venv.py to parse version specifiers.
