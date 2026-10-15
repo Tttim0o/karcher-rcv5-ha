@@ -2357,13 +2357,39 @@ Device-verified on an RCV 5 (2026-08-23) by publishing each value and watching t
 `1`–`4` drive it; every other value tried in `-2..10` is inert.
 
 - **One publish is one nudge.** The robot makes a short movement and stops; it does not
-  latch a heading. The app repeats the publish while an on-screen arrow is held, so
-  holding a course means sending repeatedly.
-- **Stopping manual drive** is `set_room_clean {clean_type: 0, ctrl_value: 0, room_ids: []}`
-  — the app's `ManualControlActivity.onBackPressed` (§5), the same command `vacuum.stop` sends.
+  latch a heading. The app repeats the publish every 300 ms while an on-screen arrow is held
+  (`RemoteControlView.LongTouchTask`), so holding a course means sending repeatedly.
+- **Stopping manual drive** on the RCV 5 is
+  `set_room_clean {clean_type: 0, ctrl_value: 0, room_ids: []}` — the app's
+  `ManualControlActivity.onBackPressed` (§5), the same command `vacuum.stop` sends.
+- **Manual drive is `work_mode` 2.** The app's remote-control screen closes itself as soon as
+  `work_mode != 2`. The integration's `WORK_MODE_*` sets do not contain 2, so
+  `derive_vacuum_state` reports `unknown` (or `docked` when docked) during a drive.
 - **Command verification is skipped.** The first nudge out of idle changes `work_mode`, but
   later nudges in the same burst land while the robot is already in that mode, so verifying
   each against `work_mode` would log a false-positive warning for every press after the first.
+
+### 17.1 Other models (static analysis, 2026-10-15)
+
+No robot other than the RCV 5 has been driven. Both vendor apps were read; the first two
+points are what they send, the rest is what they hide or branch on.
+
+- **Same values in both apps.** Home Robots v1.4.32 (`ManualControlActivity`: forward 1,
+  left 2, right 3, back 4, stop 5, exit 10; `SettingsVM.manualControl` publishes
+  `service.set_direction {"direction": n}`) and Indoor Robots 1.0.5 (blutter:
+  `DeviceRemoteControlViewModel.clickSendCmd`; enums `RemoteControlCmd` / `RemoteControlCmdV2`
+  with the same 1–4, none 5, exit 10). `5` is client-side only: the app sends nothing on
+  release.
+- **Exit differs by model.** Home Robots sends `set_direction {direction: 10}` for the RCV 2
+  and the `set_room_clean` stop above for every other model. Indoor Robots sends
+  `direction 10` on exit under the same condition that selects its `V2` pad. Which Indoor
+  Robots models that covers is not decoded.
+- **Some models have no backward arrow.** Home Robots shows a three-direction pad for the
+  RCF 3 only (`isThreeControlDirection`); Indoor Robots' `RemoteControlCmd` (V1) has no
+  `bottom`. Inferred: `direction 4` is unsupported there. Not robot-tested.
+- **Indoor Robots also sets `sweep_type = 10`** when the user picks "continue" on its exit
+  prompt (`_setSweepType`). Its effect on the robot is unknown, and the integration does not
+  send it.
 
 The firmware side is the `SetRemoteControl` cloud op noted in §9, which parses
 `direction`/`ctrlValue` into a motion-layer message.
