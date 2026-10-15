@@ -68,21 +68,25 @@ _DIRECTION_BUTTONS: tuple[KarcherDirectionButtonEntityDescription, ...] = (
     KarcherDirectionButtonEntityDescription(
         key="drive_forward",
         translation_key="drive_forward",
+        entity_registry_enabled_default=False,
         direction=DIRECTION_FORWARD,
     ),
     KarcherDirectionButtonEntityDescription(
         key="drive_backward",
         translation_key="drive_backward",
+        entity_registry_enabled_default=False,
         direction=DIRECTION_BACKWARD,
     ),
     KarcherDirectionButtonEntityDescription(
         key="drive_left",
         translation_key="drive_left",
+        entity_registry_enabled_default=False,
         direction=DIRECTION_LEFT,
     ),
     KarcherDirectionButtonEntityDescription(
         key="drive_right",
         translation_key="drive_right",
+        entity_registry_enabled_default=False,
         direction=DIRECTION_RIGHT,
     ),
 )
@@ -149,6 +153,9 @@ class KarcherDirectionButton(KarcherEntity, ButtonEntity):
     One press == one publish == one short movement; the robot does not latch a
     heading, so holding a course means pressing repeatedly (the app's D-pad
     repeats the publish while the arrow is held).
+
+    Disabled by default: it moves the robot, and the direction values are
+    verified on the RCV 5 only.
 
     Deliberately not gated on `VacuumState` — manual drive is how a user
     recovers a robot that is stuck, wedged, or parked somewhere awkward, which

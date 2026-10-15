@@ -263,7 +263,7 @@
     'config_subentry_id': <ANY>,
     'device_class': None,
     'device_id': <ANY>,
-    'disabled_by': None,
+    'disabled_by': <RegistryEntryDisabler.INTEGRATION: 'integration'>,
     'domain': 'button',
     'entity_category': None,
     'entity_id': 'button.test_robot_drive_backward',
@@ -290,17 +290,7 @@
   })
 # ---
 # name: test_all_entities_snapshot[button.test_robot_drive_backward-state]
-  StateSnapshot({
-    'attributes': ReadOnlyDict({
-      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Drive backward',
-    }),
-    'context': <ANY>,
-    'entity_id': 'button.test_robot_drive_backward',
-    'last_changed': <ANY>,
-    'last_reported': <ANY>,
-    'last_updated': <ANY>,
-    'state': 'unknown',
-  })
+  None
 # ---
 # name: test_all_entities_snapshot[button.test_robot_drive_forward-entry]
   EntityRegistryEntrySnapshot({
@@ -313,7 +303,7 @@
     'config_subentry_id': <ANY>,
     'device_class': None,
     'device_id': <ANY>,
-    'disabled_by': None,
+    'disabled_by': <RegistryEntryDisabler.INTEGRATION: 'integration'>,
     'domain': 'button',
     'entity_category': None,
     'entity_id': 'button.test_robot_drive_forward',
@@ -340,17 +330,7 @@
   })
 # ---
 # name: test_all_entities_snapshot[button.test_robot_drive_forward-state]
-  StateSnapshot({
-    'attributes': ReadOnlyDict({
-      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Drive forward',
-    }),
-    'context': <ANY>,
-    'entity_id': 'button.test_robot_drive_forward',
-    'last_changed': <ANY>,
-    'last_reported': <ANY>,
-    'last_updated': <ANY>,
-    'state': 'unknown',
-  })
+  None
 # ---
 # name: test_all_entities_snapshot[button.test_robot_empty_station-entry]
   EntityRegistryEntrySnapshot({
@@ -613,7 +593,7 @@
     'config_subentry_id': <ANY>,
     'device_class': None,
     'device_id': <ANY>,
-    'disabled_by': None,
+    'disabled_by': <RegistryEntryDisabler.INTEGRATION: 'integration'>,
     'domain': 'button',
     'entity_category': None,
     'entity_id': 'button.test_robot_turn_left',
@@ -640,17 +620,7 @@
   })
 # ---
 # name: test_all_entities_snapshot[button.test_robot_turn_left-state]
-  StateSnapshot({
-    'attributes': ReadOnlyDict({
-      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Turn left',
-    }),
-    'context': <ANY>,
-    'entity_id': 'button.test_robot_turn_left',
-    'last_changed': <ANY>,
-    'last_reported': <ANY>,
-    'last_updated': <ANY>,
-    'state': 'unknown',
-  })
+  None
 # ---
 # name: test_all_entities_snapshot[button.test_robot_turn_right-entry]
   EntityRegistryEntrySnapshot({
@@ -663,7 +633,7 @@
     'config_subentry_id': <ANY>,
     'device_class': None,
     'device_id': <ANY>,
-    'disabled_by': None,
+    'disabled_by': <RegistryEntryDisabler.INTEGRATION: 'integration'>,
     'domain': 'button',
     'entity_category': None,
     'entity_id': 'button.test_robot_turn_right',
@@ -690,17 +660,7 @@
   })
 # ---
 # name: test_all_entities_snapshot[button.test_robot_turn_right-state]
-  StateSnapshot({
-    'attributes': ReadOnlyDict({
-      <EntityStateAttribute.FRIENDLY_NAME: 'friendly_name'>: 'Test Robot Turn right',
-    }),
-    'context': <ANY>,
-    'entity_id': 'button.test_robot_turn_right',
-    'last_changed': <ANY>,
-    'last_reported': <ANY>,
-    'last_updated': <ANY>,
-    'state': 'unknown',
-  })
+  None
 # ---
 # name: test_all_entities_snapshot[number.test_robot_bedroom_clean_order-entry]
   EntityRegistryEntrySnapshot({

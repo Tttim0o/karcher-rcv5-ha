@@ -117,7 +117,9 @@ class KarcherDpadCard extends LitElement {
 
   // Resolve a drive button on the same device as the configured vacuum. Scans
   // the entity registry by device_id + translation_key rather than guessing an
-  // entity_id stem, which breaks on renames and disambiguation suffixes.
+  // entity_id stem, which breaks on renames and disambiguation suffixes. A
+  // registry entry with no state is a disabled entity (the buttons ship
+  // disabled), so it counts as missing.
   _resolveDrive(action) {
     const key = _ACTION_KEYS[action];
     if (!key || !this.hass) return null;
@@ -126,22 +128,26 @@ class KarcherDpadCard extends LitElement {
     const deviceId = this.hass.entities?.[this._config?.vacuum_entity]?.device_id;
     if (!deviceId) return null;
     for (const [entityId, entry] of Object.entries(this.hass.entities || {})) {
-      if (entry.device_id === deviceId && entry.translation_key === key) return entityId;
+      if (entry.device_id === deviceId && entry.translation_key === key && this.hass.states[entityId]) {
+        return entityId;
+      }
     }
     return null;
   }
 
   get _offline() {
     const st = this.hass?.states?.[this._config?.vacuum_entity]?.state;
-    return st === undefined || st === "unavailable" || st === "unknown";
+    if (st === undefined || st === "unavailable" || st === "unknown") return true;
+    // A button is "unknown" until first pressed, so only "unavailable" counts.
+    const btn = this._resolveDrive("drive_forward");
+    return !btn || this.hass.states[btn].state === "unavailable";
   }
 
   _onAction(e) {
     const entityId = this._resolveDrive(e.detail?.action);
-    // Silently no-op when the button is missing (integration too old, or the
-    // entity was disabled) rather than calling button.press with undefined,
-    // which HA raises on.
-    if (!entityId || !this.hass?.states[entityId]) return;
+    // Silently no-op when the button is missing rather than calling
+    // button.press with undefined, which HA raises on.
+    if (!entityId) return;
     this.hass.callService("button", "press", { entity_id: entityId });
   }
 
