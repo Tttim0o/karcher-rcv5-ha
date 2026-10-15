@@ -6,6 +6,7 @@ import {
 } from "./derive.js";
 import { panEdgeHidden, EDGE_FADE_RAMP_PX } from "./geometry.js";
 import { legendItems } from "./map-draw.js";
+import { isHaStyle } from "./constants.js";
 import { canvasCssDims } from "./card-gestures.js";
 
 // View derivation: build el._view from hass/config (operate on the card element).
@@ -323,6 +324,7 @@ export function viewState(el, attr) {
         zoneRect = { x0: z[0], y0: z[1], x1: z[2], y1: z[3] };
       }
     }
+    const haStyle = isHaStyle(el._config);
     return {
       attr,
       dpr: el._dpr || 1,
@@ -339,7 +341,29 @@ export function viewState(el, attr) {
       zoneEditable: !el._controlsLocked(activity),
       zoom: el._zoom,
       pan: el._pan,
+      haStyle,
+      accentRgb: haStyle ? themeAccentRgb(el) : "",
     };
+  }
+
+// The theme's primary colour as "r, g, b" for canvas paint (see map-draw.js).
+// getComputedStyle is too costly per reveal frame, so it is re-read only when
+// HA hands over a new themes object, dark-mode flag or selected theme. An empty
+// result (theme not applied yet) is not cached, so the next frame retries.
+function themeAccentRgb(el) {
+    const themes = el.hass?.themes;
+    const dark = themes?.darkMode;
+    const selected = el.hass?.selectedTheme?.theme;
+    const c = el._accentCache;
+    if (c && c.themes === themes && c.dark === dark && c.selected === selected) return c.rgb;
+    let rgb;
+    try {
+      rgb = getComputedStyle(el).getPropertyValue("--rgb-primary-color").trim();
+    } catch {
+      rgb = "";
+    }
+    if (rgb) el._accentCache = { themes, dark, selected, rgb };
+    return rgb;
   }
 
 // Resolve a companion entity_id, tolerating a wrong derived/configured guess.

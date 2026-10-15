@@ -16,15 +16,19 @@ export function roomColor(colorId) {
   return _ROOM_COLORS[(colorId - 1) % _ROOM_COLORS.length];
 }
 
-// Canvas paint colours — mirror the CSS --rcv-accent/--rcv-accent-deep tokens
-// (canvas fillStyle/strokeStyle can't read CSS custom properties, so these are
-// the same hex values restated as JS constants, single source for the paint code).
-const ACCENT_DEEP_HEX = "#E8BE00";
-const ACCENT_RGB = "255,212,0";                  // --rcv-accent, for alpha fills below
-const accentFill = (alpha) => `rgba(${ACCENT_RGB},${alpha})`;
-const ZONE_FILL = accentFill(0.28);              // while drawing/editing the area
-const ZONE_FILL_ACTIVE = accentFill(0.55);       // during the clean — matches ROOM_SELECTED_FILL
-const ROOM_SELECTED_FILL = ZONE_FILL_ACTIVE;
+// Canvas paint colours mirror the CSS --rcv-accent token. Canvas can't read CSS
+// custom properties, so the card passes the colour in. Classic style (default)
+// paints the fixed Kärcher yellow. With vs.haStyle the card resolves the theme's
+// --rgb-primary-color ("r, g, b") and passes it as vs.accentRgb; if that is
+// empty, HA's stock primary blue is used.
+const CLASSIC_ACCENT_RGB = "255,212,0";
+const CLASSIC_ACCENT_STROKE = "#E8BE00";
+const HA_ACCENT_RGB = "3, 169, 244";
+const accentRgb = (vs) => (vs?.haStyle ? vs.accentRgb || HA_ACCENT_RGB : CLASSIC_ACCENT_RGB);
+const accentFill = (vs, alpha) => `rgba(${accentRgb(vs)},${alpha})`;
+const accentStroke = (vs) => (vs?.haStyle ? `rgb(${accentRgb(vs)})` : CLASSIC_ACCENT_STROKE);
+const ZONE_FILL_ALPHA = 0.28;                    // while drawing/editing the area
+const selectedFillAlpha = (vs) => (vs?.haStyle ? 0.45 : 0.55);  // active area during a clean, and selected rooms
 const PATH_COLOR = "#999";
 // Robot is ~34cm wide; resolution=0.05m/cell → ~7 cells diameter → 3.5 cell radius.
 const ROBOT_RADIUS_CELLS = 3.5;
@@ -66,6 +70,7 @@ export function computeDrawKey(attr, viewState) {
     // advertising a drag the pointer handlers correctly refuse.
     !!viewState.zoneEditable,
     viewState.zoom || 1,
+    viewState.haStyle ? `ha:${viewState.accentRgb || ""}` : "classic",
     viewState.pan ? `${Math.round(viewState.pan.x)},${Math.round(viewState.pan.y)}` : "",
     // Every drawn overlay is scaled through this; it normally changes only with a
     // new map image (already covered by mapToken), but keying it directly costs
@@ -260,11 +265,10 @@ function drawZoneRect(ctx, canvas, vs) {
   const h = (n.y1 - n.y0) * scaleY;
   const radius = Math.min(10, w / 2, h / 2);
   ctx.save();
-  // Kärcher-yellow fill + accent stroke, matching the rest of the card's
-  // accent usage (--rcv-accent / --rcv-accent-deep). While editing it's the
-  // lighter draw fill; during the clean it deepens to the room-highlight alpha
-  // so the cleaned area reads at the same brightness as a highlighted room.
-  ctx.fillStyle = vs.zoneEditable ? ZONE_FILL : ZONE_FILL_ACTIVE;
+  // Accent fill + stroke, matching the card's theme accent (--rcv-accent).
+  // While editing it's the lighter draw fill; during the clean it deepens to the
+  // room-highlight alpha so the cleaned area reads like a highlighted room.
+  ctx.fillStyle = accentFill(vs, vs.zoneEditable ? ZONE_FILL_ALPHA : selectedFillAlpha(vs));
   ctx.strokeStyle = "rgba(255,255,255,0.95)";
   ctx.lineWidth = 4;
   ctx.lineJoin = "round";
@@ -272,7 +276,7 @@ function drawZoneRect(ctx, canvas, vs) {
   ctx.roundRect(x, y, w, h, radius);
   ctx.fill();
   ctx.stroke();
-  ctx.strokeStyle = ACCENT_DEEP_HEX;
+  ctx.strokeStyle = accentStroke(vs);
   ctx.lineWidth = 2.5;
   ctx.stroke();
   ctx.restore();
@@ -280,12 +284,12 @@ function drawZoneRect(ctx, canvas, vs) {
   // Handles are a resize affordance — only show them while the zone can actually
   // be edited (controls unlocked). During a clean the box stays as a static
   // "this is what's being cleaned" marker, without the dead drag handles.
-  if (vs.zoneEditable) drawZoneHandles(ctx, x, y, w, h);
+  if (vs.zoneEditable) drawZoneHandles(ctx, x, y, w, h, vs);
 }
 
 // Corner resize handles — small accent-ringed circles, matching the
 // prototype's drag handles, drawn in canvas (device) space.
-function drawZoneHandles(ctx, x, y, w, h) {
+function drawZoneHandles(ctx, x, y, w, h, vs) {
   const corners = [[x, y], [x + w, y], [x, y + h], [x + w, y + h]];
   ctx.save();
   for (const [hx, hy] of corners) {
@@ -294,7 +298,7 @@ function drawZoneHandles(ctx, x, y, w, h) {
     ctx.fillStyle = "rgba(255,255,255,0.55)";
     ctx.fill();
     ctx.lineWidth = 2.5;
-    ctx.strokeStyle = ACCENT_DEEP_HEX;
+    ctx.strokeStyle = accentStroke(vs);
     ctx.stroke();
   }
   ctx.restore();
@@ -506,7 +510,7 @@ function drawRoomOverlays(ctx, canvas, roomMap, vs) {
   for (const [id, room] of Object.entries(roomMap)) {
     const cells = room.cells;
     if (!cells || cells.length === 0) continue;
-    if (selected.has(id)) fillCells(cells, ROOM_SELECTED_FILL);
+    if (selected.has(id)) fillCells(cells, accentFill(vs, selectedFillAlpha(vs)));
   }
 }
 
@@ -582,13 +586,18 @@ function drawRoomLabels(ctx, canvas, roomMap, vs) {
     ctx.shadowColor = "rgba(0,0,0,0.35)";
     ctx.shadowBlur = 4;
     ctx.shadowOffsetY = 1;
-    ctx.fillStyle = isSelected ? accentFill(0.75) : "rgba(255,255,255,0.7)";
+    // Classic: the selected pill is filled with the accent. HA style: a solid
+    // white pill ringed in the accent, so the dark label text stays legible
+    // whatever colour the theme accent is.
+    const ringed = isSelected && vs.haStyle;
+    ctx.fillStyle = !isSelected ? "rgba(255,255,255,0.7)"
+      : vs.haStyle ? "rgba(255,255,255,0.95)" : accentFill(vs, 0.75);
     ctx.beginPath();
     ctx.roundRect(pillX, -ph / 2, pw, ph, ph / 2);
     ctx.fill();
     ctx.restore();
-    ctx.strokeStyle = "rgba(0,0,0,0.15)";
-    ctx.lineWidth = 1;
+    ctx.strokeStyle = ringed ? accentStroke(vs) : "rgba(0,0,0,0.15)";
+    ctx.lineWidth = ringed ? 2 : 1;
     ctx.stroke();
 
     ctx.textAlign = "left";

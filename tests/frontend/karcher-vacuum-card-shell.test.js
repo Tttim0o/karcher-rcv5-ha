@@ -1051,7 +1051,35 @@ describe("KarcherVacuumCard shell (flipped to LitElement)", () => {
     const el = await mountCard({ vacuum_entity: "vacuum.rcv5", show_debug: true });
     const footer = el.renderRoot.querySelector(".rcv-debug");
     expect(footer).toBeTruthy();
-    expect(footer.textContent).toContain("1.36.10");
+    expect(footer.textContent).toContain("1.37.0");
+  });
+
+  it("keeps the classic look by default: no style-ha class, map-mode floats inside the map", async () => {
+    const el = await mountCard();
+    expect(el.renderRoot.querySelector("ha-card").classList.contains("style-ha")).toBe(false);
+    expect(el.renderRoot.querySelector(".rcv-map karcher-map-mode")).toBeTruthy();
+    expect(el.renderRoot.querySelector("style").textContent).not.toContain(".style-ha");
+  });
+
+  it("card_style: ha applies the HA look and moves map-mode to its own row above the map", async () => {
+    const el = await mountCard({ vacuum_entity: "vacuum.rcv5", card_style: "ha" });
+    const card = el.renderRoot.querySelector("ha-card");
+    expect(card.classList.contains("style-ha")).toBe(true);
+    expect(el.renderRoot.querySelector("style").textContent).toContain(".style-ha");
+    expect(el.renderRoot.querySelector(".rcv-map karcher-map-mode")).toBeFalsy();
+    expect(el.renderRoot.querySelector(".rcv-map").previousElementSibling.tagName.toLowerCase())
+      .toBe("karcher-map-mode");
+  });
+
+  it("the editor sets card_style: ha when on and removes the key when off", () => {
+    const ed = document.createElement("karcher-vacuum-card-editor");
+    ed.setConfig({ vacuum_entity: "vacuum.rcv5" });
+    const seen = [];
+    ed.addEventListener("config-changed", (e) => seen.push(e.detail.config));
+    ed._onStyleToggle({ target: { checked: true } });
+    ed._onStyleToggle({ target: { checked: false } });
+    expect(seen[0].card_style).toBe("ha");
+    expect(seen[1]).toEqual({ vacuum_entity: "vacuum.rcv5" });
   });
 
   it("renders object-legend rows as inline SVG bound to the MDI glyph path", async () => {

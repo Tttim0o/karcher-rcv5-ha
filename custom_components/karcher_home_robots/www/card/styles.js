@@ -1,8 +1,10 @@
 import { CSS_A } from "./styles-shell-a.js";
 import { CSS_B } from "./styles-shell-b.js";
+import { CSS_HA } from "./styles-ha.js";
 
 // Shell CSS injected as a <style> tag (see card.js NOTE); NOT Lit static styles.
 export const _CSS = CSS_A + CSS_B;
+export const _CSS_HA = _CSS + CSS_HA;
 
 export const _EDITOR_CSS = `
   :host { display: block; }
