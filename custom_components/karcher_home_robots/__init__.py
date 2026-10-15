@@ -193,21 +193,30 @@ async def _register_lovelace_resource(hass: HomeAssistant) -> None:
     version = await hass.async_add_executor_job(_read_card_version)
     url = f"{_STATIC_PATH}/karcher-vacuum-card.js?v={version}"
 
-    for item in resource_col.async_items():
-        item_url = item.get(CONF_URL, "")
-        if not item_url.startswith(_STATIC_PATH):
-            continue
-        if item_url != url:
-            # A versionless-URL trap: without ?v=, the browser/service worker
-            # keeps serving a stale card after every deploy. Updating the
-            # existing item on version mismatch turns each release into an
-            # automatic cache bust instead of a manual hard-reload ritual.
-            await resource_col.async_update_item(item[CONF_ID], {CONF_URL: url})
-            _LOGGER.debug("Updated Lovelace resource to: %s", url)
+    ours = [
+        item
+        for item in resource_col.async_items()
+        if item.get(CONF_URL, "").startswith(f"{_STATIC_PATH}/karcher-vacuum-card.js")
+    ]
+    if not ours:
+        await resource_col.async_create_item({"res_type": "module", CONF_URL: url})
+        _LOGGER.debug("Registered Lovelace resource: %s", url)
         return
 
-    await resource_col.async_create_item({"res_type": "module", CONF_URL: url})
-    _LOGGER.debug("Registered Lovelace resource: %s", url)
+    keep, *duplicates = ours
+    if keep.get(CONF_URL) != url:
+        # A versionless-URL trap: without ?v=, the browser/service worker
+        # keeps serving a stale card after every deploy. Updating the
+        # existing item on version mismatch turns each release into an
+        # automatic cache bust instead of a manual hard-reload ritual.
+        await resource_col.async_update_item(keep[CONF_ID], {CONF_URL: url})
+        _LOGGER.debug("Updated Lovelace resource to: %s", url)
+    # Only the first entry used to be kept current, so a second one (left by an
+    # earlier install, or added by hand) stayed pinned to an old ?v= forever and
+    # the browser could load that stale card instead. One entry is all we own.
+    for item in duplicates:
+        await resource_col.async_delete_item(item[CONF_ID])
+        _LOGGER.debug("Removed duplicate Lovelace resource: %s", item.get(CONF_URL))
 
 
 async def async_setup(hass: HomeAssistant, config: dict[str, object]) -> bool:

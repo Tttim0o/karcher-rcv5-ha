@@ -38,6 +38,7 @@ def _fake_resource_collection(items: list[dict[str, str]]) -> MagicMock:
     col.async_items = MagicMock(return_value=items)
     col.async_create_item = AsyncMock()
     col.async_update_item = AsyncMock()
+    col.async_delete_item = AsyncMock()
     return col
 
 
@@ -74,6 +75,26 @@ async def test_register_updates_stale_versioned_resource(hass: HomeAssistant) ->
     col.async_update_item.assert_awaited_once_with(
         "abc123", {"url": f"{_STATIC_PATH}/karcher-vacuum-card.js?v={version}"}
     )
+    col.async_create_item.assert_not_called()
+
+
+async def test_register_removes_duplicate_resources(hass: HomeAssistant) -> None:
+    """Two entries for our card: the first is kept current, the stale extra is deleted.
+
+    Only the first match used to be touched, so a second entry stayed pinned to
+    an old ?v= and the browser could keep loading that stale card.
+    """
+    version = _read_card_version()
+    first = {"id": "keep", "url": f"{_STATIC_PATH}/karcher-vacuum-card.js?v={version}"}
+    stale = {"id": "dupe", "url": f"{_STATIC_PATH}/karcher-vacuum-card.js?v=0.0.1"}
+    other = {"id": "other", "url": "/hacsfiles/other-card/other-card.js"}
+    col = _fake_resource_collection([first, other, stale])
+    hass.data[LOVELACE_DATA] = _FakeLovelaceData(col)
+
+    await _register_lovelace_resource(hass)
+
+    col.async_delete_item.assert_awaited_once_with("dupe")
+    col.async_update_item.assert_not_called()
     col.async_create_item.assert_not_called()
 
 

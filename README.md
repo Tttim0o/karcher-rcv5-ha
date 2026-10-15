@@ -181,17 +181,17 @@ The integration ships a custom map card — no separate HACS step required. The 
 
 ### Add to a dashboard
 
-In the dashboard editor, click **Add card**, search for **Kärcher Vacuum Card**, and pick your vacuum entity. That is the whole setup — the card derives every companion entity (battery, map, current room, cleaning time and area, cleaning mode, water level, error, robot status) from the vacuum entity's stem, e.g. `vacuum.karcher_rcv5` → `sensor.karcher_rcv5_battery`, `image.karcher_rcv5_map`.
+In the dashboard editor, click **Add card**, search for **Kärcher Vacuum Card**, and pick your vacuum entity. That is the whole setup — the card finds every companion entity (battery, map, current room, cleaning time and area, cleaning mode, water level, error, robot status) on the vacuum's own device.
 
 The visual editor also sets the card height and an opt-in debug footer showing the loaded card version, HA version, state and map size — useful for confirming which card build a browser actually loaded, past the resource cache.
 
-If one of your entities was renamed away from the standard `<domain>.<stem>_<suffix>` pattern, open **Advanced — entity overrides** in the editor and point that one entity at the right entity_id.
+The card finds every companion entity (map, battery, selects, sensors) on the vacuum's own device, so renamed entities are picked up automatically. To point one field at a different entity, open **Advanced — entity overrides** in the editor and set it there; an override always wins.
 
 On a YAML-mode dashboard, where the visual editor is unavailable, the same card is:
 
 ```yaml
 type: custom:karcher-vacuum-card
-vacuum_entity: vacuum.karcher_rcv5
+vacuum_entity: vacuum.my_robot_vacuum
 ```
 
 Every editor field has a YAML key: `card_height`, `show_debug`, and one `<name>_entity` key per companion entity (`battery_entity`, `map_entity`, `current_room_entity`, …).
@@ -340,7 +340,7 @@ This is expected when Mop-only cleaning mode is selected — the robot has no su
 The map image refreshes on dock and every 10 s during active cleaning. If it never appears, check that the robot has completed at least one full clean (see above) and that `image.<name>_map` is enabled in the entity registry.
 
 **Card shows the wrong entity, or a field stays empty.**
-The card auto-derives every entity from `vacuum_entity`'s stem (see [Lovelace Card](#lovelace-card)); this fails if an entity was renamed away from the standard `<domain>.<stem>_<suffix>` pattern. Set the matching `_entity` override key in the card config to point at the correct entity_id.
+The card looks up every companion entity on the vacuum's own device (see [Lovelace Card](#lovelace-card)). A field stays empty if that entity is disabled in the entity registry; enable it, or set the matching `_entity` override key in the card config to point at the entity you want.
 
 For anything not covered here, download diagnostics (**Settings → Devices & Services → Kärcher Home Robots → ⋮ → Download diagnostics**) and attach them when opening an issue.
 
