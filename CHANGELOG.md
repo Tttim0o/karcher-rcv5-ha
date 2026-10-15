@@ -49,7 +49,7 @@ a CI gate (ADR-0004).
   display, matching the app's Privacy & Security / Carpet Settings screens.
 
 ### Changed
-- Minimum Home Assistant version is now 2026.9.0.
+- Minimum Home Assistant version is now 2026.10.0.
 - Devices now show their actual model instead of always reporting "RCV5", and every model
   gets the full entity set with a published support level saying how much evidence backs it.
   The README lists RCV 5, RCV 3, RCV 2, RCF 3, RVC 3, RVF 7 and RVM 4 with their product IDs.
@@ -138,6 +138,11 @@ a CI gate (ADR-0004).
   polling report the robot's reason instead of "prop.get reply not received within 5s".
   The dock's own fields are asked for separately, so a robot without a Suction Station
   cannot take the whole poll down with them.
+- A robot reporting a suction, water, or cleaning-mode level we don't recognise no longer
+  hides the card's Suction row or locks its Water row; unrecognised levels are logged
+  once and appear in diagnostics.
+- RVF 7 and RVF 7 Comfort suction now follows the robot's own 1-4 levels, so Turbo no longer
+  goes missing and the other levels no longer read one step off.
 
 ## Phase 4 — Hardening to Silver (closed 2026-05-02)
 
