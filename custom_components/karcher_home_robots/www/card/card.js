@@ -377,14 +377,9 @@ class KarcherVacuumCard extends LitElement {
     this.requestUpdate(); // user tab switch outside an update cycle → re-render
   }
 
-  // Resolve the fault_code sensor's live entity_id. The derived/configured
-  // cfg.fault_code_entity (sensor.<stem>_robot_status) is correct for installs
-  // created after this entity's name changed from "Fault code" to "Robot
-  // status" — but HA assigns entity_id once at first registration and never
-  // renames it, so older installs kept sensor.<stem>_fault_code. If the derived
-  // guess doesn't resolve to a real entity, fall back to a registry scan by
-  // device_id + translation_key (mirrors vacuum.py's _pref_entity_map); if that
-  // also finds nothing, fall back to the guess itself (status quo, no regression).
+  // Resolve the fault_code sensor's live entity_id: a configured id that exists
+  // wins, else a registry scan by device_id + translation_key (mirrors
+  // vacuum.py's _pref_entity_map), else the derived guess.
   _resolveFaultEntity() { return resolveFaultEntity(this); }
 
   // Same wrong-guess tolerance as _resolveFaultEntity, for the two Suction

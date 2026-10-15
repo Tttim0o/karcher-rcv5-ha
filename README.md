@@ -181,7 +181,7 @@ The integration ships a custom map card — no separate HACS step required. The 
 
 ### Add to a dashboard
 
-In the dashboard editor, click **Add card**, search for **Kärcher Vacuum Card**, and pick your vacuum entity. That is the whole setup — the card derives every companion entity (battery, map, current room, cleaning time and area, cleaning mode, water level, error, robot status) from the vacuum entity's stem, e.g. `vacuum.karcher_rcv5` → `sensor.karcher_rcv5_battery`, `image.karcher_rcv5_map`.
+In the dashboard editor, click **Add card**, search for **Kärcher Vacuum Card**, and pick your vacuum entity. That is the whole setup — the card finds every companion entity (battery, map, current room, cleaning time and area, cleaning mode, water level, error, robot status) on the vacuum's own device.
 
 The visual editor also sets the card height and an opt-in debug footer showing the loaded card version, HA version, state and map size — useful for confirming which card build a browser actually loaded, past the resource cache.
 
@@ -191,7 +191,7 @@ On a YAML-mode dashboard, where the visual editor is unavailable, the same card 
 
 ```yaml
 type: custom:karcher-vacuum-card
-vacuum_entity: vacuum.kaercher_rcv_5_vacuum
+vacuum_entity: vacuum.my_robot_vacuum
 ```
 
 Every editor field has a YAML key: `card_height`, `show_debug`, and one `<name>_entity` key per companion entity (`battery_entity`, `map_entity`, `current_room_entity`, …).

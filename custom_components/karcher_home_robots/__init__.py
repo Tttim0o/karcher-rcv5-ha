@@ -196,7 +196,7 @@ async def _register_lovelace_resource(hass: HomeAssistant) -> None:
     ours = [
         item
         for item in resource_col.async_items()
-        if item.get(CONF_URL, "").startswith(_STATIC_PATH)
+        if item.get(CONF_URL, "").startswith(f"{_STATIC_PATH}/karcher-vacuum-card.js")
     ]
     if not ours:
         await resource_col.async_create_item({"res_type": "module", CONF_URL: url})

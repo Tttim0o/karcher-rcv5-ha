@@ -1,6 +1,6 @@
 import { tr, setLang, STATUS_SLUG_LABELS, STATE_LABELS, countLabels } from "./i18n.js";
-import { _EDITOR_COMPANIONS,
-  isOccupied, isBusy, isUsableValue, isUsableState, batteryIcon, BATTERY_LOW_THRESHOLD,
+import {
+  _EDITOR_COMPANIONS, isOccupied, isBusy, isUsableValue, isUsableState, batteryIcon, BATTERY_LOW_THRESHOLD,
   primaryCleanLabel, targetStripLabel, deriveStatTiles, deriveSelectorRows, deriveRoomRows,
   parseRoomOrder, reconcileCustomise,
 } from "./derive.js";
@@ -342,7 +342,6 @@ export function viewState(el, attr) {
     };
   }
 
-
 // Resolve a companion entity_id, tolerating a wrong derived/configured guess.
 // deriveCompanions() guesses `<domain>.<vacuum_entity_stem>_<suffix>`, which is
 // only correct if the stem HA actually assigned to every entity on this device
@@ -351,7 +350,8 @@ export function viewState(el, attr) {
 // translation_key existed). When the guess doesn't resolve to a live state,
 // fall back to a registry scan by device_id + translation_key (mirrors
 // vacuum.py's _pref_entity_map) — authoritative, independent of any guessed
-// string shape. Falls back to the guess itself if that also finds nothing
+// string shape. A configured id missing from hass.states is treated like a
+// guess, so it too falls through to the registry. Falls back to the guess itself if that also finds nothing
 // (status quo — the caller's own not-found handling takes over).
 export function resolveCompanionEntity(el, cfgKey, translationKey) {
     const cfgId = el._config?.[cfgKey];
