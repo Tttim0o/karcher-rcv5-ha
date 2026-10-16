@@ -12,7 +12,8 @@ POLL_INTERVAL_SECONDS = 30
 WORK_MODE_CLEANING: frozenset[int] = frozenset({1, 7, 25, 30, 36, 81})
 WORK_MODE_GO_HOME: frozenset[int] = frozenset({5, 10, 11, 12, 21, 26, 32, 38, 47})
 WORK_MODE_PAUSE: frozenset[int] = frozenset({4, 9, 27, 31, 37, 82})
-WORK_MODE_IDLE: frozenset[int] = frozenset({0, 14, 23, 29, 35, 40, 85})
+# 2 is manual drive (set_direction); the app closes its remote screen when work_mode != 2.
+WORK_MODE_IDLE: frozenset[int] = frozenset({0, 2, 14, 23, 29, 35, 40, 85})
 
 # work_mode values whose active task is an area (zone) clean, across its
 # lifecycle: 30=cleaning, 31=paused, 32=returning, 35=idle. The robot encodes

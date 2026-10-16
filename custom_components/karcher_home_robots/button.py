@@ -155,7 +155,8 @@ class KarcherDirectionButton(KarcherEntity, ButtonEntity):
     repeats the publish while the arrow is held).
 
     Disabled by default: it moves the robot, and the direction values are
-    verified on the RCV 5 only.
+    verified on the RCV 5 only. The first nudge during a clean cancels it (the
+    robot goes straight to manual drive, never paused), so it cannot be resumed.
 
     Deliberately not gated on `VacuumState` — manual drive is how a user
     recovers a robot that is stuck, wedged, or parked somewhere awkward, which

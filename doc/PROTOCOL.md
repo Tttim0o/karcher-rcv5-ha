@@ -2363,8 +2363,11 @@ Device-verified on an RCV 5 (2026-08-23) by publishing each value and watching t
   `set_room_clean {clean_type: 0, ctrl_value: 0, room_ids: []}` — the app's
   `ManualControlActivity.onBackPressed` (§5), the same command `vacuum.stop` sends.
 - **Manual drive is `work_mode` 2.** The app's remote-control screen closes itself as soon as
-  `work_mode != 2`. The integration's `WORK_MODE_*` sets do not contain 2, so
-  `derive_vacuum_state` reports `unknown` (or `docked` when docked) during a drive.
+  `work_mode != 2`. The integration treats 2 as an idle mode (`WORK_MODE_IDLE`), so the
+  vacuum shows `idle` while driving and `docked` once back on the dock.
+- **A nudge during a clean cancels it.** RCV 5, HA 2026.10.1 (community report, PR #199): the
+  first nudge stops the clean and the robot follows the arrows. `work_mode` goes `cleaning` →
+  2 within a second and never passes through `paused`, so the clean cannot be resumed.
 - **Command verification is skipped.** The first nudge out of idle changes `work_mode`, but
   later nudges in the same burst land while the robot is already in that mode, so verifying
   each against `work_mode` would log a false-positive warning for every press after the first.

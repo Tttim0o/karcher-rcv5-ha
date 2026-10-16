@@ -20,7 +20,8 @@ a CI gate (ADR-0004).
   own row above the map. The default look is unchanged.
 - Manual drive: four button entities (drive forward / backward, turn left / right) that nudge
   the robot one step per press, plus a standalone `karcher-dpad-card` Lovelace card. The
-  buttons are disabled by default; enable them in the entity list.
+  buttons are disabled by default; enable them in the entity list. A nudge during a clean
+  cancels it.
 - Localization: full Romanian, German, French, Italian, Spanish, and Dutch translations
   for every Home Assistant string and all Lovelace card text; each loads automatically when
   the Home Assistant language matches. Dutch translation contributed by @macbos.
